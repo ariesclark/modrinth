@@ -2,6 +2,7 @@
     "name": "Modrinth.js",
     "entryPoints": "src",
     "out": "docs",
+    "disableOutputCheck": true,
     "excludeExternals": true,
     "excludeInternal": true,
     "excludeProtected": true,
