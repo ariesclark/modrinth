@@ -1,6 +1,6 @@
 import { HTTP } from "@rubybb/http";
 import { all as merge } from "deepmerge";
-import NodeCache from "node-cache";
+import { Cache } from "./cache";
 
 import * as Package from "../package.json";
 
@@ -33,7 +33,7 @@ export class Modrinth {
 
     public options: Partial<Options> = {};
     /** @internal */
-    public cache: NodeCache;
+    public cache: Cache;
     /** @internal */
     public api: HTTP;
 
@@ -41,8 +41,10 @@ export class Modrinth {
         this.options = merge([{}, Modrinth.defaultOptions, options]);
 
         if (typeof this.options.cache === "number") {
-            this.cache = new NodeCache({
-                stdTTL: this.options.cache
+            this.cache = new Cache({
+                ttl: this.options.cache,
+                capacity: 100,
+
             });
         }
 
@@ -87,5 +89,15 @@ export class Modrinth {
     public async mods (...id: string[]): Promise<Mod[]>;
     public async mods (...ids: string[] | [string[]]): Promise<Mod[]> {
         return Mod.getMultiple(([].concat(...ids)), this);
+    }
+
+    public async version (id: string): Promise<Version> {
+        return Version.get(id, this);
+    }
+
+    public async versions (id: string[]): Promise<Version[]>;
+    public async versions (...id: string[]): Promise<Version[]>;
+    public async versions (...ids: string[] | [string[]]): Promise<Version[]> {
+        return Version.getMultiple(([].concat(...ids)), this);
     }
 }

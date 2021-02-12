@@ -5,7 +5,7 @@ JavaScript library for accessing the [**Modrinth**](https://modrinth.com) API.
 
 ## Resources
 [**Website**](https://modrinth.js.org) -
-[**Documentation**](https://modrinth.js.org/docs/) -
+[**Documentation**](https://modrinth.js.org/) -
 [**Discord**](https://discord.gg/WUgGJhS)
 
 
@@ -28,10 +28,32 @@ const modrinth = new Modrinth({
 
 modrinth.user("rubybb"); // Promise<User>
 modrinth.user("suMONnLn"); // Promise<User>
-modrinth.users(["rubybb", "jellysquid3"]) // Promise<[User, User]>
-modrinth.users(["rubybb", "TEZXhE2U"]) // Promise<[User, User]>
+modrinth.users(["rubybb", "jellysquid3"]); // Promise<[User, User]>
+modrinth.users(["rubybb", "TEZXhE2U"]); // Promise<[User, User]>
 
-modrinth.mod("lambdynamiclights") // Promise<Mod>
-modrinth.mod("yBW8D80W") // Promise<Mod>
-modrinth.mods(["lambdynamiclights", "sodium"]) // Promise<[Mod, Mod]>
+modrinth.mod("lambdynamiclights"); // Promise<Mod>
+modrinth.mod("yBW8D80W"); // Promise<Mod>
+modrinth.mods(["lambdynamiclights", "sodium"]); // Promise<[Mod, Mod]>
+
+modrinth.user("jellysquid3").then(async user => {
+    const mods = await user.mods();
+    console.log(mods);
+
+    /* 
+    * something like this. :) 
+    * for the actual object returned, take a look the the documentation.
+    * https://modrinth.js.org/classes/mod.html
+    */
+    [
+        {
+            id: "AANobbMI",
+            slug: "sodium",
+            title: "Sodium",
+            status: "approved",
+            downloads: 1490,
+            ...
+        },
+        ...
+    ]
+});
 ```

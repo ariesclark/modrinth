@@ -46,7 +46,18 @@ export class ModrinthObject <
     }
 
     protected mutate (source: ObjectSource): void {
-        Object.assign(this, source);
+        for (let key in source) {
+
+            // don't override existing values.
+            if (this[key as string]) continue;
+
+            Object.defineProperty(this, key, {
+                value: source[key],
+                configurable: true,
+                enumerable: true,
+                writable: true
+            })
+        }
     }
 
     async fetch (): Promise<ObjectSource> {
@@ -59,7 +70,7 @@ export class ModrinthObject <
     }
 
     getResourceURL (): string {
-        return "https://modrinth.com/" + this.getObjectLocation();
+        return "https://modrinth.com/" + this.getResourceLocation();
     }
 
     getObjectLocation (): string {
@@ -67,7 +78,7 @@ export class ModrinthObject <
     }
 
     getObjectURL (): string {
-        return this._modrinth.options.url + this.getResourceLocation();
+        return this._modrinth.options.url + this.getObjectLocation();
     }
 
     toString (): string {

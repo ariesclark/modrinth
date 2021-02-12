@@ -76,6 +76,8 @@ export class Mod extends ModrinthObject<typeof Mod, Mod, ModSource> {
         const cacheKey = Mod.getCacheKey(source.id);
         const cached = modrinth.cache.get<Mod>(cacheKey);
 
+        console.log(!!cached)
+
         if (cached) return cached;
         return new Mod(source, modrinth);
     }
@@ -91,6 +93,6 @@ export class Mod extends ModrinthObject<typeof Mod, Mod, ModSource> {
     public updated: Date;
 
     public async versions (): Promise<Version[]> {
-        return Version.getMultiple((this as any)._versions as string[], this._modrinth);
+        return Version.getMultiple(this._source.versions, this._modrinth);
     }
 }

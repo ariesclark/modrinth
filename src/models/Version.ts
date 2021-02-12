@@ -53,12 +53,12 @@ export class Version extends ModrinthObject<typeof Version, Version, VersionSour
         return modrinth.api.get<VersionSource[]>("versions", {query: {ids: JSON.stringify(ids)}})
     }
 
-    public static getObjectLocation (id: string) {
+    public static getObjectLocation (id: string): string {
         return `version/${id}`;
     }
 
-    public static getResourceLocation (id: string) {
-        return Version.getObjectLocation(id);
+    public static getResourceLocation (id: string): string {
+        throw new Error("Version doesn't have static resource location");
     }
 
     public static getCacheKey (id: string): string {
@@ -77,8 +77,12 @@ export class Version extends ModrinthObject<typeof Version, Version, VersionSour
 
     protected mutate (source: VersionSource): void {
         super.mutate(source);
-
+        
         this.date_published = new Date(source.date_published);
+    }
+
+    public getResourceLocation (): string {
+        return `${Mod.getResourceLocation(this.mod_id)}/version/${this.id}`;
     }
 
     public date_published: Date;
