@@ -42,12 +42,8 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add *
           git commit -m "update documentation (?)" -a
-
-      - name: release documentation
-        uses: ad-m/github-push-action@master
-        with:
-          repository: "rubybb/modrinth.js.org"
-          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          git remote set-url origin https://rubybb:${{ secrets.GH_ACCESS_TOKEN }}@github.com/rubybb/modrinth.js.org.git
+          git push
 
       - name: release package
         run: |
