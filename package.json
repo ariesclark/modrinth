@@ -2,7 +2,7 @@
   "name": "modrinth",
   "description": "JavaScript library for accessing the Modrinth API",
   "author": "rubybb <https://github.com/rubybb>",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "types": "src/index.d.ts",
   "main": "src/index.js",
   "scripts": {
