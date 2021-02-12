@@ -37,11 +37,10 @@ jobs:
 
       - name: commit documentation
         run: |
+          git clone https://rubybb:${{ secrets.GH_ACCESS_TOKEN }}@github.com/rubybb/modrinth.js.org.git docs
           cd docs
           git add *
           git commit -m "update documentation (?)" -a
-          git remote set-url origin https://rubybb:${{ secrets.GH_ACCESS_TOKEN }}@github.com/rubybb/modrinth.js.org.git
-          git remote get-url origin
           git push
 
       - name: release package
