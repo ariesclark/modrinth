@@ -46,8 +46,11 @@ jobs:
       - name: release documentation
         uses: ad-m/github-push-action@master
         with:
+          repository: "rubybb/modrinth.js.org"
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
 
       - name: release package
         run: |
+          cd lib
+          cp ../readme.md .
           npm publish
