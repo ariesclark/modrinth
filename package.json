@@ -6,10 +6,14 @@
   "types": "index.d.ts",
   "main": "index.js",
   "scripts": {
-    "build": "rm ./lib -rf && tsc",
-    "test": "jest --config jestconfig.json",
-    "build:docs": "rm ./docs -rf && pnpx typedoc",
-    "dev:docs": "pnpm build:docs && pnpx lite-server --baseDir=\"docs\""
+    "clean": "rm ./lib ./docs -rf",
+
+    "dev:build": "tsc",
+    "dev:docs": "pnpx typedoc",
+    "dev:serve": "pnpm build:docs && pnpx lite-server --baseDir=\"docs\"",
+
+    "prod:build": "tsc && npx typedoc && npm publish",
+    "prod:serve": ""
   },
   "repository": {
     "type": "git",

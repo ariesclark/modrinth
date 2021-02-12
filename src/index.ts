@@ -1,8 +1,3 @@
-/**
- * @packageDocumentation
- * @module Modrinth Module
- */
-
 import { HTTP } from "@rubybb/http";
 import { all as merge } from "deepmerge";
 import NodeCache from "node-cache";
@@ -58,13 +53,13 @@ export class Modrinth {
             headers: {
                 "content-type": "application/json",
                 "user-agent": (!isBrowser ? 
-                    `${Package.displayName} v${Package.version} <http://npmjs.com/${Package.name}>` :
+                    `Modrinth v${Package.version} <http://npmjs.com/modrinth>` :
                     window.navigator.userAgent
                 )
             }
         });
 
-        this.login(this.options.authorization || "");
+        this.login(this.options.authorization);
     }
 
     public get useCache (): boolean {
@@ -72,8 +67,7 @@ export class Modrinth {
     }
 
     public login (token: string): void {
-        if (!token) throw new ReferenceError("Missing authorization token");
-        this.api.mutate({headers: {"authorization": token}});
+        if (token) this.api.mutate({headers: {"authorization": token}});
     } 
 
     public async user (id: string): Promise<User> {

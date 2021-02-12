@@ -1,9 +1,3 @@
-/**
- * This is the doc comment for file1.ts
- * @packageDocumentation
- * @module Object Module
- */
-
 import type { Modrinth } from "./index";
 
 export interface ModrinthSourceObject {
