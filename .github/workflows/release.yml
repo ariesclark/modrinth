@@ -44,7 +44,7 @@ jobs:
       - name: release documentation
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
 
       - name: release package
         run: |
