@@ -3,8 +3,8 @@
   "description": "JavaScript library for accessing the Modrinth API",
   "author": "rubybb <https://github.com/rubybb>",
   "version": "1.0.2",
-  "types": "index.d.ts",
-  "main": "index.js",
+  "types": "src/index.d.ts",
+  "main": "src/index.js",
   "scripts": {
     "clean": "rm ./lib ./docs -rf",
     "dev:build": "tsc",
