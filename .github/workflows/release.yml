@@ -26,18 +26,14 @@ jobs:
       - name: build package
         run: tsc
 
-      - name: checkout documentation branch
-        run: git clone https://rubybb:${{ secrets.GH_ACCESS_TOKEN }}@github.com/rubybb/modrinth.js.org.git docs
-          
-      - name: build documentation
-        run: npx typedoc
-
-      - name: commit documentation
+      - name: release documentation
         run: |
-          env
+          git clone https://rubybb:${{ secrets.GH_ACCESS_TOKEN }}@github.com/rubybb/modrinth.js.org.git docs
+          git config --global user.name "github-actions[bot]"
+          npx typedoc
           cd docs
           git add *
-          git commit -m "update documentation (?)" -a
+          git commit -m "update documentation ($GITHUB_SHA)" -a
           git push
 
       - name: release package
