@@ -1,0 +1,9 @@
+{
+    "name": "Modrinth.js",
+    "entryPoints": "src",
+    "out": "docs",
+    "excludeExternals": true,
+    "excludeInternal": true,
+    "excludeProtected": true,
+    "excludePrivate": true
+}
