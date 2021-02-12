@@ -37,7 +37,7 @@ export class Modrinth {
     /** @internal */
     public api: HTTP;
 
-    constructor (options: Partial<Options>) {
+    constructor (options: Partial<Options> = {}) {
         this.options = merge([{}, Modrinth.defaultOptions, options]);
 
         if (typeof this.options.cache === "number") {
