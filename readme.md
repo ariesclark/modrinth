@@ -10,7 +10,7 @@ JavaScript library for accessing the [**Modrinth**](https://modrinth.com) API.
 
 
 ## Install
-Available on NPM: [**Modrinth.js**](https://www.npmjs.com/package/@rubybb/http)
+Available on NPM: [**Modrinth.js**](https://www.npmjs.com/package/modrinth)
 
 Ruby's recommended package manager: <br/>
 [**pnpm: 📦🚀 Fast, disk space efficient package manager**](https://pnpm.js.org/).
