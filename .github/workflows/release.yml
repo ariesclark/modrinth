@@ -27,17 +27,14 @@ jobs:
         run: tsc
 
       - name: checkout documentation branch
-        uses: actions/checkout@v2
-        with:
-          repository: rubybb/modrinth.js.org
-          path: docs
-
+        run: git clone https://rubybb:${{ secrets.GH_ACCESS_TOKEN }}@github.com/rubybb/modrinth.js.org.git docs
+          
       - name: build documentation
         run: npx typedoc
 
       - name: commit documentation
         run: |
-          git clone https://rubybb:${{ secrets.GH_ACCESS_TOKEN }}@github.com/rubybb/modrinth.js.org.git docs
+          env
           cd docs
           git add *
           git commit -m "update documentation (?)" -a
