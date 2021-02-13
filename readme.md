@@ -35,13 +35,16 @@ modrinth.mod("lambdynamiclights"); // Promise<Mod>
 modrinth.mod("yBW8D80W"); // Promise<Mod>
 modrinth.mods(["lambdynamiclights", "sodium"]); // Promise<[Mod, Mod]>
 
+modrinth.version("hKXQNf9z"); // Promise<Version>
+modrinth.versions(["YuZK7F05", "hKXQNf9z"]); // Promise<[Version, Version>]
+
 modrinth.user("jellysquid3").then(async user => {
     const mods = await user.mods();
     console.log(mods);
 
     /* 
     * something like this. :) 
-    * for the actual object returned, take a look the the documentation.
+    * for the actual object returned, take a look at the documentation.
     * https://modrinth.js.org/classes/mod.html
     */
     [
