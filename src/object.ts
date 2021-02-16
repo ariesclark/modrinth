@@ -70,7 +70,7 @@ export class ModrinthObject <
     }
 
     getResourceURL (): string {
-        return "https://modrinth.com/" + this.getResourceLocation();
+        return this._modrinth.siteURL + this.getResourceLocation();
     }
 
     getObjectLocation (): string {
@@ -78,7 +78,7 @@ export class ModrinthObject <
     }
 
     getObjectURL (): string {
-        return this._modrinth.options.url + this.getObjectLocation();
+        return this._modrinth.apiURL + this.getObjectLocation();
     }
 
     toString (): string {

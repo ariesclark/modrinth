@@ -12,22 +12,29 @@ export interface Options {
     authorization: string;
     cache: number | false;
     debug: boolean;
+
     url: string;
+    api: string;
+    cdn: string;
 }
 
 /** @internal */
-export const isBrowser = typeof window !== "undefined";
+const isBrowser = typeof window !== "undefined";
 
 export class Modrinth {
+    public static version: string = Package.version;
+
     public static get defaultOptions (): Partial<Options> {
         return {
-            url: "https://api.modrinth.com/api/v1/",
+            url: "https://modrinth.com/",
+            api: "https://api.modrinth.com/api/v1/",
+            cdn: "https://cdn.modrinth.com/",
             authorization: (!isBrowser ? 
                 process.env["MODRINTH_TOKEN"] :
                 localStorage.getItem("MODRINTH_TOKEN")
             ) || "",
             debug: false,
-            cache: 300
+            cache: 1000
         };
     }
 
@@ -38,30 +45,45 @@ export class Modrinth {
     public api: HTTP;
 
     constructor (options: Partial<Options> = {}) {
-        this.options = merge([{}, Modrinth.defaultOptions, options]);
+        this.options = merge([
+            Object.create(null), 
+            Modrinth.defaultOptions, 
+            options
+        ]);
 
         if (typeof this.options.cache === "number") {
             this.cache = new Cache({
                 ttl: this.options.cache,
                 capacity: 100,
-
             });
         }
 
         this.api = HTTP.create({
-            baseURL: this.options.url,
+            baseURL: this.apiURL,
             debug: this.options.debug,
             resultType: "json",
             headers: {
                 "content-type": "application/json",
                 "user-agent": (!isBrowser ? 
-                    `Modrinth v${Package.version} <http://npmjs.com/modrinth>` :
+                    `Modrinth v${Modrinth.version} <https://modrinth.js.org>` :
                     window.navigator.userAgent
                 )
             }
         });
 
         this.login(this.options.authorization);
+    }
+
+    public get apiURL (): string {
+        return this.options.api;
+    }
+
+    public get cdnURL (): string {
+        return this.options.cdn;
+    }
+
+    public get siteURL (): string {
+        return this.options.url;
     }
 
     public get useCache (): boolean {
