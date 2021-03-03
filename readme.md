@@ -1,7 +1,8 @@
 # Modrinth.js
 JavaScript library for accessing the [**Modrinth**](https://modrinth.com) API.
 
-[![Discord](https://img.shields.io/discord/418093857394262020?label=discord&style=for-the-badge)](https://discord.gg/WUgGJhS) [![Maintenance](https://img.shields.io/maintenance/yes/2021?style=for-the-badge)]() ![GitHub issues](https://img.shields.io/github/issues/rubybb/modrinth?style=for-the-badge) ![npm bundle size (scoped)](https://img.shields.io/bundlephobia/min/modrinth?style=for-the-badge) ![NPM](https://img.shields.io/npm/l/modrinth?style=for-the-badge)
+[![Discord](https://img.shields.io/discord/418093857394262020?label=discord&style=for-the-badge)](https://discord.gg/WUgGJhS) [![Maintenance](https://img.shields.io/maintenance/yes/2021?style=for-the-badge)][![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Frubybb%2Fmodrinth.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Frubybb%2Fmodrinth?ref=badge_shield)
+() ![GitHub issues](https://img.shields.io/github/issues/rubybb/modrinth?style=for-the-badge) ![npm bundle size (scoped)](https://img.shields.io/bundlephobia/min/modrinth?style=for-the-badge) ![NPM](https://img.shields.io/npm/l/modrinth?style=for-the-badge)
 
 **Disclaimer: This package is in no way an official package, nor will you recieve support from the Modrinth Team in any official capacity for using this package. Any and all problems or support should be directed to [Ruby](https://discord.gg/WUgGJhS), our [issue tracker](https://github.com/rubybb/modrinth/issues), or other contributors.**
 
@@ -62,3 +63,6 @@ modrinth.user("jellysquid3").then(async user => {
     ]
 });
 ```
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Frubybb%2Fmodrinth.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Frubybb%2Fmodrinth?ref=badge_large)
