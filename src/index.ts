@@ -95,31 +95,31 @@ export class Modrinth {
     } 
 
     public async user (id: string): Promise<User> {
-        return User.get(id, this);
+        return User.get(this, id);
     }
 
     public async users (id: string[]): Promise<User[]>;
     public async users (...id: string[]): Promise<User[]>;
     public async users (...ids: string[] | [string[]]): Promise<User[]> {
-        return User.getMultiple(([].concat(...ids)), this);
+        return User.getMultiple(this, ([].concat(...ids)));
     }
     public async mod (id: string): Promise<Mod> {
-        return Mod.get(id, this);
+        return Mod.get(this, id);
     }
 
     public async mods (id: string[]): Promise<Mod[]>;
     public async mods (...id: string[]): Promise<Mod[]>;
     public async mods (...ids: string[] | [string[]]): Promise<Mod[]> {
-        return Mod.getMultiple(([].concat(...ids)), this);
+        return Mod.getMultiple(this, ([].concat(...ids)));
     }
 
     public async version (id: string): Promise<Version> {
-        return Version.get(id, this);
+        return Version.get(this, id);
     }
 
     public async versions (id: string[]): Promise<Version[]>;
     public async versions (...id: string[]): Promise<Version[]>;
     public async versions (...ids: string[] | [string[]]): Promise<Version[]> {
-        return Version.getMultiple(([].concat(...ids)), this);
+        return Version.getMultiple(this, ([].concat(...ids)));
     }
 }

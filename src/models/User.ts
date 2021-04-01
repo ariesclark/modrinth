@@ -29,19 +29,19 @@ export type UserSourceOmit = (
 export interface User extends Omit<UserSource, UserSourceOmit> {}
 export class User extends ModrinthObject<typeof User, User, UserSource> {
 
-    public static async get (id: string, modrinth: Modrinth): Promise<User> {
-        return User.from(await User.fetch(id, modrinth), modrinth);
+    public static async get (modrinth: Modrinth, id: string): Promise<User> {
+        return User.from(modrinth, await User.fetch(modrinth, id));
     }
 
-    public static async getMultiple (ids: string[], modrinth: Modrinth): Promise<User[]> {
-        return (await User.fetchMultiple(ids, modrinth)).map((user) => User.from(user, modrinth));
+    public static async getMultiple (modrinth: Modrinth, ids: string[]): Promise<User[]> {
+        return (await User.fetchMultiple(modrinth, ids)).map((user) => User.from(modrinth, user));
     }
     
-    public static async fetch (id: string, modrinth: Modrinth): Promise<UserSource> {
+    public static async fetch (modrinth: Modrinth, id: string): Promise<UserSource> {
         return modrinth.api.get<UserSource>(User.getObjectLocation(id));
     }
 
-    public static async fetchMultiple (ids: string[], modrinth: Modrinth): Promise<UserSource[]> {
+    public static async fetchMultiple (modrinth: Modrinth, ids: string[]): Promise<UserSource[]> {
         return modrinth.api.get<UserSource[]>("users", {query: {ids: JSON.stringify(ids)}})
     }
 
@@ -57,14 +57,14 @@ export class User extends ModrinthObject<typeof User, User, UserSource> {
         return User.getObjectLocation(id);
     }
 
-    protected static from (source: UserSource, modrinth: Modrinth): User {
-        if (!modrinth.useCache) return new User(source, modrinth);
+    protected static from (modrinth: Modrinth, source: UserSource): User {
+        if (!modrinth.useCache) return new User(modrinth, source);
 
         const cacheKey = User.getCacheKey(source.id);
         const cached = modrinth.cache.get<User>(cacheKey);
 
         if (cached) return cached;
-        return new User(source, modrinth);
+        return new User(modrinth, source);
     }
 
     protected mutate (source: UserSource): void {
@@ -77,6 +77,6 @@ export class User extends ModrinthObject<typeof User, User, UserSource> {
 
     public async mods (): Promise<Mod[]> {
         const ids = await this._modrinth.api.get<string[]>(`user/${this.id}/mods`);
-        return Mod.getMultiple(ids, this._modrinth);
+        return Mod.getMultiple(this._modrinth, ids);
     }
 }

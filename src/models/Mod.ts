@@ -42,19 +42,19 @@ export type ModSourceOmit = (
 
 export interface Mod extends Omit<ModSource, ModSourceOmit> {}
 export class Mod extends ModrinthObject<typeof Mod, Mod, ModSource> {
-    public static async get (id: string, modrinth: Modrinth): Promise<Mod> {
-        return Mod.from(await Mod.fetch(id, modrinth), modrinth);
+    public static async get (modrinth: Modrinth, id: string): Promise<Mod> {
+        return Mod.from(modrinth, await Mod.fetch(modrinth, id));
     }
 
-    public static async getMultiple (ids: string[], modrinth: Modrinth): Promise<Mod[]> {
-        return (await Mod.fetchMultiple(ids, modrinth)).map((mod) => Mod.from(mod, modrinth));
+    public static async getMultiple (modrinth: Modrinth, ids: string[]): Promise<Mod[]> {
+        return (await Mod.fetchMultiple(modrinth, ids)).map((mod) => Mod.from(modrinth, mod));
     }
     
-    public static async fetch (id: string, modrinth: Modrinth): Promise<ModSource> {
+    public static async fetch (modrinth: Modrinth, id: string): Promise<ModSource> {
         return modrinth.api.get<ModSource>(Mod.getObjectLocation(id));
     }
 
-    public static async fetchMultiple (ids: string[], modrinth: Modrinth): Promise<ModSource[]> {
+    public static async fetchMultiple (modrinth: Modrinth, ids: string[]): Promise<ModSource[]> {
         return modrinth.api.get<ModSource[]>("mods", {query: {ids: JSON.stringify(ids)}});
     }
 
@@ -70,16 +70,14 @@ export class Mod extends ModrinthObject<typeof Mod, Mod, ModSource> {
         return Mod.getObjectLocation(id);
     }   
 
-    protected static from (source: ModSource, modrinth: Modrinth): Mod {
-        if (!modrinth.useCache) return new Mod(source, modrinth);
+    protected static from (modrinth: Modrinth, source: ModSource): Mod {
+        if (!modrinth.useCache) return new Mod(modrinth, source);
 
         const cacheKey = Mod.getCacheKey(source.id);
         const cached = modrinth.cache.get<Mod>(cacheKey);
 
-        console.log(!!cached)
-
         if (cached) return cached;
-        return new Mod(source, modrinth);
+        return new Mod(modrinth, source);
     }
 
     protected mutate (source: ModSource): void {
@@ -93,6 +91,14 @@ export class Mod extends ModrinthObject<typeof Mod, Mod, ModSource> {
     public updated: Date;
 
     public async versions (): Promise<Version[]> {
-        return Version.getMultiple(this._source.versions, this._modrinth);
+        return Version.getMultiple(this._modrinth, this._source.versions);
+    }
+
+    public async update (): Promise<Mod> {
+        return null;
+    }
+
+    public async createVersion (body: any, file: any): Promise<Version> {
+        return Version.create(this._modrinth, {...body, mod_id: this.id}, file);
     }
 }

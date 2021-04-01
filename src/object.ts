@@ -5,11 +5,11 @@ export interface ModrinthSourceObject {
 }
 
 export interface ModrinthStaticModel <ObjectResult, ObjectSource> extends Function {
-    get: (id: string, modrinth: Modrinth) => Promise<ObjectResult>;
-    getMultiple: (id: string[], modrinth: Modrinth) => Promise<ObjectResult[]>;
+    get: (modrinth: Modrinth, id: string) => Promise<ObjectResult>;
+    getMultiple: (modrinth: Modrinth, id: string[]) => Promise<ObjectResult[]>;
 
-    fetch: (id: string, modrinth: Modrinth) => Promise<ObjectSource>;
-    fetchMultiple: (id: string[], modrinth: Modrinth) => Promise<ObjectSource[]>;
+    fetch: (modrinth: Modrinth, id: string) => Promise<ObjectSource>;
+    fetchMultiple: (modrinth: Modrinth, id: string[]) => Promise<ObjectSource[]>;
 
     getResourceLocation: (id: string) => string;
     getObjectLocation: (id: string) => string;
@@ -32,7 +32,7 @@ export class ModrinthObject <
     public objectURL: string;
     public resourceURL: string;
     
-    constructor (source: ObjectSource, modrinth: Modrinth) {
+    constructor (modrinth: Modrinth, source: ObjectSource) {
         this._modrinth = modrinth;
         this._source = source;
 
@@ -62,7 +62,7 @@ export class ModrinthObject <
 
     async fetch (): Promise<ObjectSource> {
         const Model = (this.constructor as any);
-        return Model.fetch(this.id, this._modrinth);
+        return Model.fetch(this._modrinth, this.id);
     }
 
     getResourceLocation (): string {
@@ -82,6 +82,7 @@ export class ModrinthObject <
     }
 
     toString (): string {
+        // return JSON.stringify(this);
         return `${this.id} <${this.constructor.name}; ${this.getResourceURL()}>`;
     }
 }
