@@ -4,7 +4,7 @@ import { Cache } from "./cache";
 
 import * as Package from "../package.json";
 
-import { Version } from "./models/Version";
+import { UploadFile, Version } from "./models/Version";
 import { User } from "./models/User";
 import { Mod } from "./models/Mod";
 
@@ -18,9 +18,6 @@ export interface Options {
     cdn: string;
 }
 
-/** @internal */
-const isBrowser = typeof window !== "undefined";
-
 export class Modrinth {
     public static version: string = Package.version;
 
@@ -29,10 +26,7 @@ export class Modrinth {
             url: "https://modrinth.com/",
             api: "https://api.modrinth.com/api/v1/",
             cdn: "https://cdn.modrinth.com/",
-            authorization: (!isBrowser ? 
-                process.env["MODRINTH_TOKEN"] :
-                localStorage.getItem("MODRINTH_TOKEN")
-            ) || "",
+            authorization: (process.env["MODRINTH_TOKEN"]) || "",
             debug: false,
             cache: 1000
         };
@@ -51,7 +45,7 @@ export class Modrinth {
             options
         ]);
 
-        if (typeof this.options.cache === "number") {
+        if (typeof this.options.cache === "number" && this.options.cache > 0) {
             this.cache = new Cache({
                 ttl: this.options.cache,
                 capacity: 100,
@@ -64,10 +58,7 @@ export class Modrinth {
             resultType: "json",
             headers: {
                 "content-type": "application/json",
-                "user-agent": (!isBrowser ? 
-                    `Modrinth v${Modrinth.version} <https://modrinth.js.org>` :
-                    window.navigator.userAgent
-                )
+                "user-agent": `Modrinth v${Modrinth.version} <https://modrinth.js.org>`
             }
         });
 
@@ -92,7 +83,15 @@ export class Modrinth {
 
     public login (token: string): void {
         if (token) this.api.mutate({headers: {"authorization": token}});
-    } 
+    }
+
+    public async self (): Promise<User | null> {
+        return User.current(this);
+    }
+
+    public async currentUser (): Promise<User | null> {
+        return User.current(this);
+    }
 
     public async user (id: string): Promise<User> {
         return User.get(this, id);
@@ -121,5 +120,9 @@ export class Modrinth {
     public async versions (...id: string[]): Promise<Version[]>;
     public async versions (...ids: string[] | [string[]]): Promise<Version[]> {
         return Version.getMultiple(this, ([].concat(...ids)));
+    }
+
+    public async createVersion (mod_id: string, data: any, files: UploadFile[]): Promise<Version> {
+        return Version.create(this, data, files);
     }
 }

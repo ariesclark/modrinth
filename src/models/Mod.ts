@@ -1,33 +1,10 @@
 
 import { Modrinth } from "../index";
-import { ModrinthObject, ModrinthSourceObject} from "../object";
+import { ModrinthObject} from "../object";
+import { ModSource } from "../structs/ModSource";
+import { Category } from "../structs/tags/Category";
 
 import { Version } from "./Version";
-
-export interface ModSource extends ModrinthSourceObject {
-    id: string;
-    slug: string;
-    team: string;
-    title: string;
-    description: string;
-    body: string;
-    body_url: string;
-    published: string;
-    updated: string;
-    status: string;
-    license: License;
-    client_side: string;
-    server_side: string;
-    downloads: number;
-    categories: string[];
-    versions: string[];
-    icon_url: string | null;
-    issues_url: string | null;
-    source_url: string | null;
-    wiki_url: string | null;
-    discord_url: string | null;
-    donation_urls: string[];
-}
 
 export interface License {
     id: string;
@@ -43,15 +20,15 @@ export type ModSourceOmit = (
 export interface Mod extends Omit<ModSource, ModSourceOmit> {}
 export class Mod extends ModrinthObject<typeof Mod, Mod, ModSource> {
     public static async get (modrinth: Modrinth, id: string): Promise<Mod> {
-        return Mod.from(modrinth, await Mod.fetch(modrinth, id));
+        return Mod.fromSource(modrinth, await Mod.fetch(modrinth, id));
     }
 
     public static async getMultiple (modrinth: Modrinth, ids: string[]): Promise<Mod[]> {
-        return (await Mod.fetchMultiple(modrinth, ids)).map((mod) => Mod.from(modrinth, mod));
+        return (await Mod.fetchMultiple(modrinth, ids)).map((mod) => Mod.fromSource(modrinth, mod));
     }
     
     public static async fetch (modrinth: Modrinth, id: string): Promise<ModSource> {
-        return modrinth.api.get<ModSource>(Mod.getObjectLocation(id));
+        return modrinth.api.get<ModSource>(Mod.getObjectLocation(id), {headers: {pragma: "no-cache"}});
     }
 
     public static async fetchMultiple (modrinth: Modrinth, ids: string[]): Promise<ModSource[]> {
@@ -68,9 +45,25 @@ export class Mod extends ModrinthObject<typeof Mod, Mod, ModSource> {
 
     public static getCacheKey (id: string): string {
         return Mod.getObjectLocation(id);
-    }   
+    }
+    
+    public static toSource (object: Mod): Partial<ModSource> {
+        // if (object._source) return object._source;
+        object = Object.assign(Object.create(null), object);
+        Object.keys(object).forEach((key) => {
+            const value = object[key];
+            if (key.startsWith("_") || typeof value === "function")
+                delete object[key];
+        })
 
-    protected static from (modrinth: Modrinth, source: ModSource): Mod {
+        const json = {...object as any};
+        if (object.published) json.published = object.published.toISOString();
+        if (object.updated) json.updated = object.updated.toISOString();
+
+        return json as Partial<ModSource>;
+    }
+
+    public static fromSource (modrinth: Modrinth, source: ModSource): Mod {
         if (!modrinth.useCache) return new Mod(modrinth, source);
 
         const cacheKey = Mod.getCacheKey(source.id);
@@ -80,11 +73,19 @@ export class Mod extends ModrinthObject<typeof Mod, Mod, ModSource> {
         return new Mod(modrinth, source);
     }
 
-    protected mutate (source: ModSource): void {
+    public static async update (modrinth: Modrinth, id: string, update: Partial<Mod>): Promise<void> {
+        const json = JSON.stringify(Mod.toSource(update as Mod), null, 4);
+        return void await modrinth.api.patch(Mod.getObjectLocation(id), json, {
+            resultType: "status"
+        });
+    }
+
+    public mutate (source: ModSource): Mod {
         super.mutate(source);
 
         this.published = new Date(source.published);
         this.updated = new Date(source.updated);
+        return this;
     }
 
     public published: Date;
@@ -94,8 +95,9 @@ export class Mod extends ModrinthObject<typeof Mod, Mod, ModSource> {
         return Version.getMultiple(this._modrinth, this._source.versions);
     }
 
-    public async update (): Promise<Mod> {
-        return null;
+    public async update (update: Partial<Mod>): Promise<Mod> {
+        await Mod.update(this._modrinth, this.id, update);
+        return await this.get();
     }
 
     public async createVersion (body: any, file: any): Promise<Version> {

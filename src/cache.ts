@@ -1,8 +1,6 @@
 export interface CacheOptions {
     ttl: number;
     capacity: number;
-    sweepRate: number;
-    sweepLimit: number;
 }
 
 export interface CacheData<Item> {
@@ -16,20 +14,15 @@ export type CacheMap<Item> = {[key: string]: CacheData<Item>};
 export class Cache <Item = unknown> {
     public static defaultOptions: CacheOptions = {
         ttl: Infinity,
-        capacity: Infinity,
-        sweepLimit: 5,
-        sweepRate: 1000
+        capacity: Infinity
     }
 
     protected options: Partial<CacheOptions> = {};
     protected data: CacheMap<Item>;
 
-    public lastSweep: number;
-
     constructor (options: Partial<CacheOptions> = Object.create(null)) {
         Object.assign(this.options, Cache.defaultOptions, options);
         this.data = Object.create(null);
-        this.sweep(true);
     }
 
     public get now (): number {
@@ -56,28 +49,14 @@ export class Cache <Item = unknown> {
         return (this.size / this.capacity) * 100;
     }
 
-    protected sweep (queueNext = false): void {
-        if (queueNext) setTimeout(() => this.sweep(true), this.options.sweepRate);
-        this.lastSweep = this.now;
-
-        let swept = 0;
-        const keys = Object.keys(this.data);
-
-        for (const key in keys) {
-            if (swept >= this.options.sweepLimit) break;
-
-            const item = this.data[key];
-            if (!item) continue;
-
-            if (item.expiry >= Date.now()) {
-                this.delete(key);
-                swept++;
-            }
-        }
-    }
-
     public get <GetItem extends Item> (key: string): GetItem {
-        return this.data[key]?.value as GetItem;
+        if (!this.data[key]) return;
+        if (this.data[key].expiry >= Date.now()) {
+            this.delete(key);
+            return;
+        }
+
+        return this.data[key].value as GetItem;
     }
 
     public has (key: string): boolean {
@@ -86,7 +65,6 @@ export class Cache <Item = unknown> {
 
     public set (key: string, value: Item, ttl?: number): CacheData<Item> {
         if (!ttl) ttl = this.options.ttl;
-
         if (this.full) this.prune(1);
 
         return this.data[key] = {
@@ -96,7 +74,7 @@ export class Cache <Item = unknown> {
     }
 
     public prune (amount: number = 1) {
-        // the keys of the {amount} oldest items.
+        /** the keys of the {amount} oldest items. */ 
         const keys = Object.keys(this.data).splice(0, amount);
 
         for (const key in keys) {
@@ -105,7 +83,7 @@ export class Cache <Item = unknown> {
     }
 
     public delete (key: string): void {
-        delete this.data[key];
+        if (this.data[key]) delete this.data[key];
     }
 
     public clear (): void {

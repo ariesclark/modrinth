@@ -1,52 +1,70 @@
 import FormData from "form-data";
 
 import { Modrinth } from "../index";
-import { ModrinthObject, ModrinthSourceObject} from "../object";
+import { ModrinthObject} from "../object";
 
 import { Mod } from "./Mod";
 import { User } from "./User";
 
 import fetch from "node-fetch";
+import { Loader } from "../structs/tags/Loader";
+import { VersionSource } from "../structs/VersionSource";
+import { GameVersion } from "../structs/tags/GameVersion";
 
-
-export interface File {
-    hashes: {[key: string]: string};
-    filename: string;
-    primary: boolean;
-    url: string;
+export interface UploadFile {
+    name: string;
+    data: any;
 }
 
-export interface VersionSource extends ModrinthSourceObject {
-    id: string;
+export type VersionType = "release" | "beta" | "alpha";
+
+export interface VersionCreationSource {
     mod_id: string;
-    author_id: string;
-    featured: boolean;
-    name: string;
+    file_parts: string[];
     version_number: string;
-    changelog: string;
-    changelog_url: string | null;
-    date_published: string;
-    downloads: number;
-    version_type: string;
-    files: File[];
-    dependencies: any[];
+    version_title: string;
+    version_body: string;
+    dependencies: unknown[];
     game_versions: string[];
-    loaders: string[];
+    release_channel: VersionType
+    loaders: Loader[];
+    featured: boolean;
+}
+
+export interface VersionCreation {
+    mod_id: string;
+    title?: string;
+    number: string;
+    body: string;
+    dependencies?: unknown[];
+    game_versions: string[];
+    type: VersionType;
+    loaders: Loader[];
+    featured?: boolean;
 }
 
 /** @internal */
 export type VersionSourceOmit = (
     "date_published"
+    | "version_type"
 );
 
-export interface Version extends Omit<VersionSource, VersionSourceOmit> {}
+export interface Version extends Omit<VersionSource, VersionSourceOmit> {
+    date_published: Date;
+    type: VersionType;
+    
+    loaders: Loader[];
+    game_versions: GameVersion[];
+    
+}
+
 export class Version extends ModrinthObject<typeof Version, Version, VersionSource> {
     public static async get (modrinth: Modrinth, id: string): Promise<Version> {
-        return Version.from(modrinth, await Version.fetch(modrinth, id));
+        return Version.fromSource(modrinth, await Version.fetch(modrinth, id));
     }
 
     public static async getMultiple (modrinth: Modrinth, ids: string[]): Promise<Version[]> {
-        return (await Version.fetchMultiple(modrinth, ids)).map((version) => Version.from(modrinth, version));
+        return (await Version.fetchMultiple(modrinth, ids)).map((version) => Version.fromSource(modrinth, version));
     }
     
     public static async fetch (modrinth: Modrinth, id: string): Promise<VersionSource> {
@@ -69,7 +87,11 @@ export class Version extends ModrinthObject<typeof Version, Version, VersionSour
         return Version.getObjectLocation(id);
     }
 
-    protected static from (modrinth: Modrinth, source: VersionSource): Version {
+    public static toSource (object: Version): VersionSource {
+        if (object._source) return object._source;
+    }
+
+    public static fromSource (modrinth: Modrinth, source: VersionSource): Version {
         if (!modrinth.useCache) return new Version(modrinth, source);
 
         const cacheKey = Version.getCacheKey(source.id);
@@ -79,48 +101,54 @@ export class Version extends ModrinthObject<typeof Version, Version, VersionSour
         return new Version(modrinth, source);
     }
 
-    public static async create (modrinth: Modrinth, body: any, files: any[]): Promise<Version> {
+    public static async create (modrinth: Modrinth, body: VersionCreation, files: UploadFile[]): Promise<Version> {
         const form = new FormData();
-        form.append("data", JSON.stringify({...body, ...{
-            file_parts: files.map((file, index) => `${file.name}-${index}`)
-        }}));
+        const data: VersionCreationSource = {
+            mod_id: body.mod_id,
 
+            version_title: body.title || body.number,
+            version_number: body.number,
+            version_body: body.body,
+
+            loaders: body.loaders,
+            game_versions: body.game_versions,
+            release_channel: body.type,
+
+            featured: body.featured ?? false,
+            dependencies: body.dependencies || [],
+
+            file_parts: files.map((_, index) => `${index}`)
+        };
+
+        form.append("data", JSON.stringify(data));
         files.map((file, index) => {
-            form.append(`${file.name}-${index}`, file.data, {
+            form.append(`${index}`, file.data, {
                 filename: file.name,
             })
-        })
+        });
 
-        console.log(form)
-        let r = await fetch("https://api.modrinth.com/api/v1/version", {
-            method: "post",
-            body: form,
-            
-            headers: {
-                ...modrinth.api.options.headers,
-                ...form.getHeaders()
+        return Version.fromSource(
+            modrinth, 
+            await modrinth.api.post<VersionSource>("version", form, {
+                headers: form.getHeaders()
             }
-        })
-
-        console.log(r, await r.json())
-        return null;
-        //const raw = await modrinth.api.post<VersionSource>("version", form.toString(), {headers: form.getHeaders()});
-
-        //console.log(raw);
-        //return Version.from(modrinth, raw);
+        ));
     }
 
-    protected mutate (source: VersionSource): void {
-        super.mutate(source);
-        
+    public mutate (source: VersionSource): Version {
+        const _source = Object.assign({}, source);
+
+        delete _source["version_type"];
+        super.mutate(_source);
+
+        this.type = source.version_type as VersionType;
         this.date_published = new Date(source.date_published);
+        return this;
     }
 
     public getResourceLocation (): string {
         return `${Mod.getResourceLocation(this.mod_id)}/version/${this.id}`;
     }
-
-    public date_published: Date;
 
     public async getMod (): Promise<Mod> {
         return Mod.get(this._modrinth, this.mod_id);

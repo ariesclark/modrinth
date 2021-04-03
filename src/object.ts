@@ -1,9 +1,5 @@
 import type { Modrinth } from "./index";
 
-export interface ModrinthSourceObject {
-    id: string
-}
-
 export interface ModrinthStaticModel <ObjectResult, ObjectSource> extends Function {
     get: (modrinth: Modrinth, id: string) => Promise<ObjectResult>;
     getMultiple: (modrinth: Modrinth, id: string[]) => Promise<ObjectResult[]>;
@@ -15,22 +11,27 @@ export interface ModrinthStaticModel <ObjectResult, ObjectSource> extends Functi
     getObjectLocation: (id: string) => string;
 
     getCacheKey: (id: string) => string;
+
+    fromSource: (modrinth: Modrinth, source: ObjectSource) =>  ObjectResult;
+    toSource: (object: ObjectResult) => Partial<ObjectSource>;
+    // toPartialSource: (object: Partial<ObjectResult>) => Partial<ObjectSource>;
 }
 
 export class ModrinthObject <
     ModelStatic extends ModrinthStaticModel <ObjectResult, ObjectSource>, 
     ObjectResult extends ModrinthObject <ModelStatic, ObjectResult, ObjectSource>, 
-    ObjectSource extends ModrinthSourceObject
-> implements ModrinthSourceObject {
+    ObjectSource
+> {
     protected ["constructor"]: ModelStatic;
     
     protected _source: ObjectSource;
     protected _modrinth: Modrinth;
+    protected _dirty: boolean = false;
 
     public id: string;
 
-    public objectURL: string;
-    public resourceURL: string;
+    public object_url: string;
+    public resource_url: string;
     
     constructor (modrinth: Modrinth, source: ObjectSource) {
         this._modrinth = modrinth;
@@ -38,18 +39,16 @@ export class ModrinthObject <
 
         this.mutate(source);
 
-        this.objectURL = this.getObjectURL();
-        this.resourceURL = this.getResourceURL();
+        this.object_url = this.getObjectURL();
+        this.resource_url = this.getResourceURL();
 
         if (!modrinth.useCache) return;
         modrinth.cache.set(this.constructor.getCacheKey(this.id), this);
     }
 
-    protected mutate (source: ObjectSource): void {
+    protected mutate (source: ObjectSource): ObjectResult {
         for (let key in source) {
-
-            // don't override existing values.
-            if (this[key as string]) continue;
+            if (Object.getPrototypeOf(this)[key]) continue;
 
             Object.defineProperty(this, key, {
                 value: source[key],
@@ -58,15 +57,22 @@ export class ModrinthObject <
                 writable: true
             })
         }
+
+        // NOTE: Dangerous type casting??
+        return this as unknown as ObjectResult;
     }
 
-    async fetch (): Promise<ObjectSource> {
-        const Model = (this.constructor as any);
+    protected async fetch (): Promise<ObjectSource> {
+        const Model = this.constructor;
         return Model.fetch(this._modrinth, this.id);
     }
 
+    async get (): Promise<ObjectResult> {
+        return this.mutate(await this.fetch());
+    }
+
     getResourceLocation (): string {
-        return this.constructor.getResourceLocation(this.id);
+        return this.constructor.getResourceLocation((this as any).slug || this.id);
     }
 
     getResourceURL (): string {
@@ -81,8 +87,14 @@ export class ModrinthObject <
         return this._modrinth.apiURL + this.getObjectLocation();
     }
 
+    toJSON (): unknown {
+        // remove circular structures.
+        const { _modrinth, _source, ...object } = this;
+        return object;
+    }
+
     toString (): string {
-        // return JSON.stringify(this);
-        return `${this.id} <${this.constructor.name}; ${this.getResourceURL()}>`;
+        const identifier = (this as any).name || (this as any).title || (this as any).slug || this.id;
+        return `${identifier} <${this.constructor.name}; ${this.resource_url}>`;
     }
 }

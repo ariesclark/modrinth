@@ -24,7 +24,7 @@ jobs:
         run: npm i
 
       - name: build package
-        run: tsc
+        run: npm run build
 
       - name: release documentation
         run: |

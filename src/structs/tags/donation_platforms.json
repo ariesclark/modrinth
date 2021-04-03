@@ -1,0 +1,26 @@
+[
+    {
+        "short": "patreon",
+        "name": "Patreon"
+    },
+    {
+        "short": "bmac",
+        "name": "Buy Me a Coffee"
+    },
+    {
+        "short": "paypal",
+        "name": "PayPal"
+    },
+    {
+        "short": "github",
+        "name": "GitHub Sponsors"
+    },
+    {
+        "short": "ko-fi",
+        "name": "Ko-fi"
+    },
+    {
+        "short": "other",
+        "name": "Other"
+    }
+]
