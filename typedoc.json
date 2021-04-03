@@ -6,5 +6,6 @@
     "excludeExternals": true,
     "excludeInternal": true,
     "excludeProtected": true,
-    "excludePrivate": true
+    "excludePrivate": true,
+    "gaID": "G-1QXM9100R4"
 }

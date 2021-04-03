@@ -5,6 +5,5 @@ const modrinth = new Modrinth({ debug: false });
 const self = await modrinth.self();
 console.log(`Welcome back, ${self.name}.`);
 
-const mod = await modrinth.mod("test");
-//mod.upload("changelog", {})
-console.log(mod);
+await self.update({bio: "hi uwu lol"});
+console.log(self)

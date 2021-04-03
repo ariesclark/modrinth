@@ -24,7 +24,7 @@ jobs:
         run: npm i
 
       - name: build package
-        run: npm run build
+        run: npm run release
 
       - name: release documentation
         run: |
