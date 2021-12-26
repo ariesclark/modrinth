@@ -1,7 +1,7 @@
 # Modrinth.js
 JavaScript library for accessing the [**Modrinth**](https://modrinth.com) API.
 
-[![Discord](https://img.shields.io/discord/418093857394262020?label=discord&style=for-the-badge)](https://discord.gg/WUgGJhS) [![Maintenance](https://img.shields.io/maintenance/yes/2021?style=for-the-badge)]() ![GitHub issues](https://img.shields.io/github/issues/rubybb/modrinth?style=for-the-badge) ![npm bundle size (scoped)](https://img.shields.io/bundlephobia/min/modrinth?style=for-the-badge) ![NPM](https://img.shields.io/npm/l/modrinth?style=for-the-badge)
+[![Discord](https://img.shields.io/discord/418093857394262020?label=discord&style=for-the-badge)](https://discord.gg/azqKNq5geD) [![Maintenance](https://img.shields.io/maintenance/no/2022?style=for-the-badge)]() ![GitHub issues](https://img.shields.io/github/issues/rubybb/modrinth?style=for-the-badge) ![npm bundle size (scoped)](https://img.shields.io/bundlephobia/min/modrinth?style=for-the-badge) ![NPM](https://img.shields.io/npm/l/modrinth?style=for-the-badge)
 
 **Disclaimer: This package is in no way an official package, nor will you recieve support from the Modrinth Team in any official capacity for using this package. Any and all problems or support should be directed to [Ruby](https://discord.gg/WUgGJhS), our [issue tracker](https://github.com/rubybb/modrinth/issues), or other contributors.**
 
@@ -9,7 +9,7 @@ JavaScript library for accessing the [**Modrinth**](https://modrinth.com) API.
 [**Website**](https://modrinth.js.org) -
 [**Documentation**](https://modrinth.js.org/) -
 [**Source**](https://github.com/rubybb/modrinth/) -
-[**Discord**](https://discord.gg/WUgGJhS)
+[**Discord**](https://discord.gg/azqKNq5geD)
 
 ## Install
 Available on NPM: [**Modrinth.js**](https://www.npmjs.com/package/modrinth)
