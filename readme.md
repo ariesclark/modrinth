@@ -1,3 +1,6 @@
+# **Not currently maintained due to a dispute with the Modrinth Team and other related individuals.**
+If you're interested in maintaining this package, feel free to contact me on Discord. support inquries will be ignored.
+
 # Modrinth.js
 JavaScript library for accessing the [**Modrinth**](https://modrinth.com) API.
 
